@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>For You ❤️</title>
+<style>
+  body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(180deg,#0b1020 0%,#1c2435 100%);color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;padding:20px}
+  .card{background:rgba(255,255,255,0.05);border-radius:16px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,0.4);width:100%;max-width:700px;text-align:center;position:relative;overflow-y:auto;max-height:95vh}
+  input,textarea{padding:10px 14px;border-radius:8px;border:1px solid #444;background:#1e2738;color:#fff;width:80%;margin:8px 0}
+  button{padding:10px 18px;border:none;border-radius:10px;background:#ff7597;color:#fff;font-weight:600;cursor:pointer;transition:.3s}
+  button:hover{opacity:.9}
+  .hidden{display:none}
+  .shayari{margin-top:20px;font-style:italic;color:#ffdfe8}
+  .admin{position:absolute;top:10px;right:10px;font-size:13px;color:#a0a8c0;text-align:right}
+  .codeBox{background:#0b1220;padding:10px;border-radius:8px;margin-top:8px;word-break:break-all}
+  #decodedArea{background:#101524;border-radius:12px;padding:10px;margin-top:10px;text-align:left}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="admin">
+    <div>Admin view</div>
+    <input id="adminCode" placeholder="Paste code" style="width:180px">
+    <button id="viewBtn">View</button>
+    <div id="decodedArea" class="hidden"></div>
+  </div>
+
+  <h1>Hey... 💖</h1>
+  <div id="birthQ">
+    <p>Enter his birth date (DDMMYYYY):</p>
+    <input type="text" id="dob" maxlength="8" placeholder="e.g. 22042001">
+    <br><button id="dobBtn">Submit</button>
+  </div>
+
+  <div id="wrongDOB" class="hidden">
+    <p class="shayari">“Kabhi kabhi zindagi mein sab kuch sahi hote hue bhi, kuch kami reh jaati hai... 💔”</p>
+    <p>Try again, maybe you got the date wrong 😢</p>
+    <button id="retryBtn">Try Again</button>
+  </div>
+
+  <div id="loveBond" class="hidden">
+    <p class="shayari">“Waqt ruk jaata hai jab tum meri zindagi mein ho... 💞”</p>
+    <h3>Let's check our Love Bond ❤️</h3>
+
+    <textarea id="meet" rows="2" placeholder="When and how did you first meet him?"></textarea>
+    <textarea id="moment" rows="2" placeholder="Your favourite moment with him"></textarea>
+    <input id="color" placeholder="What’s his favourite colour?">
+    <div>
+      <label><input type="radio" name="place" value="Mountain"> Mountain</label>
+      <label><input type="radio" name="place" value="Beach"> Beach</label>
+    </div>
+    <textarea id="love" rows="2" placeholder="How much do you love him? 💕"></textarea>
+
+    <button id="submitBtn">Submit Answers</button>
+
+    <div id="resultArea" class="hidden">
+      <p class="shayari">“Chahe dooriyaan badh jaayein, par dil ke raaste kabhi door nahi hote... 💫”</p>
+      <p>Here’s your unique love code — send it to him 💌</p>
+      <div class="codeBox" id="codeBox"></div>
+      <button id="copyBtn">Copy Code</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function encodeData(obj){return btoa(unescape(encodeURIComponent(JSON.stringify(obj))))}
+function decodeData(code){try{return JSON.parse(decodeURIComponent(escape(atob(code))))}catch(e){return null}}
+
+const CORRECT_DOB='12061998';
+
+const birthQ=document.getElementById('birthQ');
+const wrongDOB=document.getElementById('wrongDOB');
+const loveBond=document.getElementById('loveBond');
+const decodedArea=document.getElementById('decodedArea');
+
+document.getElementById('dobBtn').onclick=()=>{
+  const val=document.getElementById('dob').value.trim();
+  if(val===CORRECT_DOB){
+    birthQ.classList.add('hidden');
+    loveBond.classList.remove('hidden');
+  } else {
+    birthQ.classList.add('hidden');
+    wrongDOB.classList.remove('hidden');
+  }
+};
+
+document.getElementById('retryBtn').onclick=()=>{
+  wrongDOB.classList.add('hidden');
+  birthQ.classList.remove('hidden');
+  document.getElementById('dob').value='';
+};
+
+document.getElementById('submitBtn').onclick=()=>{
+  const meet=document.getElementById('meet').value.trim();
+  const moment=document.getElementById('moment').value.trim();
+  const color=document.getElementById('color').value.trim();
+  const love=document.getElementById('love').value.trim();
+  const place=document.querySelector('input[name="place"]:checked');
+  if(!meet||!moment||!color||!love||!place){alert('Please fill all answers ❤️');return;}
+  const payload={meet,moment,color,place:place.value,love,time:new Date().toLocaleString()};
+  const code=encodeData(payload);
+  document.getElementById('resultArea').classList.remove('hidden');
+  document.getElementById('codeBox').textContent=code;
+};
+
+document.getElementById('copyBtn').onclick=()=>{
+  navigator.clipboard.writeText(document.getElementById('codeBox').textContent);
+  alert('Copied! Send this code to him on WhatsApp 💬');
+};
+
+document.getElementById('viewBtn').onclick=()=>{
+  const code=document.getElementById('adminCode').value.trim();
+  if(!code){alert('Paste the code first');return;}
+  const data=decodeData(code);
+  if(!data){alert('Invalid code');return;}
+  decodedArea.innerHTML=`<strong>Responses:</strong><br>
+  🕒 <b>Submitted:</b> ${data.time}<br>
+  💌 <b>When met:</b> ${data.meet}<br>
+  🌈 <b>Favourite moment:</b> ${data.moment}<br>
+  🎨 <b>Favourite colour:</b> ${data.color}<br>
+  🏖 <b>Person type:</b> ${data.place}<br>
+  ❤️ <b>Love level:</b> ${data.love}`;
+  decodedArea.classList.remove('hidden');
+};
+</script>
+</body>
+</html>
